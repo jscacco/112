@@ -1,8 +1,0 @@
-mywriter: writer.o List.o
-	c++ -o mywriter writer.cc List.cc
-
-writer.o: writer.cc List.h
-	c++ -c writer.cc 
-
-List.o: List.cc List.h
-	c++ -c List.cc

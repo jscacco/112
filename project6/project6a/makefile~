@@ -1,8 +1,0 @@
-ldriver: ldriver.o List.o
-	c++ -o ldriver ldrivercc List.cc
-
-ldriver.o: ldriver.cc List.h
-	c++ -c ldriver.cc 
-
-List.o: List.cc List.h
-	c++ -c List.cc
