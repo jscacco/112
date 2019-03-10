@@ -1,0 +1,209 @@
+"""
+/******************************************************************************
+ *
+ * Name:	Jack Scacco
+ *
+ * Date:	9-12-17
+ *
+ * Assignment: Project 2	
+ *
+ * Purpose: To create a graphical card class that will complete certain actions 
+ based on how many times a button has been clicked.
+ *
+ *****************************************************************************/
+"""
+
+import tkinter as tk
+import random 
+
+class Game(tk.Tk):
+    """This class extends the Tk system to create a class that can be
+    manipulated with tk methods as well as custom ones."""
+
+    def __init__(self, width=500, height=300, loc=(25, 25)):
+        """ The constructor. Creates a window with width and
+        height at location loc."""
+                  
+        #Parent class constructor
+        tk.Tk.__init__(self)
+
+        #Establish boundaries of window
+        (x, y) = loc
+        geo = "%dx%d+%d+%d" % (width, height, x, y)
+        self.geometry(geo)
+
+        #Create a variable for the window that tracks the number of button 
+        #clicks
+        self.clicks = 0
+
+        #Create a Quit button in the bottom right corner of the window 
+        self._quitButton = tk.Button(self, text="Quit", command=self.quit)
+        self._quitButton.place(x=width-60, y=height-30)
+
+        #Create a Do It button that performs different actions based on 
+        #number of clicks
+        self._doitButton = tk.Button(self, text="Do it!", 
+                                     command=self.cardActions)
+        self._doitButton.place(x=5, y=height-30)
+
+        #Create the card to be used in the program and place it off-screen
+        self._card1 = Card(self, (100, -100), self.randomizeCard())
+
+    def start(self):
+        """This method is called when the grpahics system is ready
+        to be run."""
+       
+        self.mainloop()
+
+    def quitself(self):
+        """This method is run to close out the application. It is called
+        by the Quit button"""
+
+        self.destroy()
+
+    def cardActions(self):
+        """This function tells the program what to do when the Do It button is 
+        clicked based on how many times it has already been clicked"""
+        
+        if self.clicks == 0:
+            #Move the card to a visible location on the screen
+            self._card1.show()
+        elif self.clicks == 1:
+            #Flip the card over
+            self._card1.flip()
+        elif self.clicks == 2:
+            #Move the card 10 pixels to the right
+            self._card1.move((10, 0))
+        elif self.clicks == 3:
+            #Move the card to an invisible location
+            self._card1.unshow()
+        elif self.clicks == 4:
+            #Flip the card over
+            self._card1.flip()
+        elif self.clicks == 5:
+            #Move the card 10 pixels to the right
+            self._card1.move((10, 0))
+        elif self.clicks == 6:
+            #Move the card back to a visible location on the screen
+            self._card1.show()
+        elif self.clicks == 7:
+            #Close the window
+            self.quitself()
+
+        self.clicks += 1
+        
+    def randomizeCard(self):
+        """This method randomizes the card that is shown"""
+        #This section of code establishes the possible suits and ranks
+        allSuits = ["c", "s", "d", "h"]
+        allRanks = ["a", "2", "3", "4", "5", "6", "7", "8", "9", "1",
+                    "j", "q", "k"]
+        
+        #This section of code randomly assigns a suit and rank 
+        self.suit = allSuits[random.randrange(0, 4)]
+        self.rank = allRanks[random.randrange(0, 13)]
+
+        #Create the name of the card with string formatting
+        imageName = "cardImages/%s%s.gif" % (self.suit, self.rank)
+
+        return imageName
+        
+class Card(tk.Canvas):
+    """This class creates a Card widget that can be manipulated
+    within the app. It extends tk.Canvas"""
+    def __init__(self, window, loc, frontImage="cardImages/s1.gif", 
+                 backImage="cardImages/back.gif"):
+        """The constructor. Creates a card in window of dimensions 
+        widthxheight at location loc with background 'image.'"""
+        
+        #This code esablishes instance variables
+        self._window = window
+        self._front = tk.PhotoImage(file=frontImage)
+        self._back = tk.PhotoImage(file=backImage)
+
+        #This keeps track of the card's appearance
+        self.faceUp = False
+
+        #Set the width and height to the dimensions of the image supplied
+        self._width = self._front.width()
+        self._height = self._front.height()
+        self._loc = loc
+
+        #Call the parent constructor so that there is a canvas to use
+        tk.Canvas.__init__(self, self._window, width=self._width,
+                           height=self._height)
+
+        #Place the card at location loc
+        (x, y) = self._loc
+        self.place(x=x, y=y)
+
+        #create a partial border to create a 3D effect
+        self._rect = self.create_rectangle(1, 1, self._width, self._height)
+
+        #Set the card's image to the card back
+        self.image = self.create_image(0, 0, anchor='nw', image=self._back)
+
+    def flip(self):
+        """This fucntion flips the card over to its other side"""
+        if not self.faceUp:
+            #Flip card 'face up'
+            self.itemconfig(self.image, image=self._front)
+            self.faceUp = True
+        else: 
+            #Flip card 'face down'
+            self.itemconfig(self.image, image=self._back)
+            self.faceUp = False
+
+    def move(self, loc):
+        """This method is a pseudo-move method that is seen with canvases, but 
+        is designed specifically for the card"""
+        #Get the current coordinates
+        x = self.winfo_x()
+        y = self.winfo_y()
+
+        #Unpack tuple for the change in position
+        (dx, dy) = loc
+        
+        #Set new coordinates
+        newx = x + dx
+        newy = y + dy
+
+        #Actually move the widget
+        self.place(x=newx, y=newy)
+
+    def show(self):
+        """This method moves the card to a visible location"""
+        #Unable to get working, some error with self.move()
+        self.move((0, 200))
+    
+    def unshow(self):
+        """This method moves the card to a non-visible location"""
+        #Same issue as above
+        self.move((0, -200))
+
+def main():
+    """The first function called"""
+    #Initialize the application
+    mainWindow = Game()
+    
+    #Hand control over to the graphics interface
+    mainWindow.start()
+
+    #Confirm that the program is still running after the app is closed
+    print("Done!")
+
+if __name__ == "__main__":
+    main()
+
+#CITE: TAs
+#DESC: Assisted with general diificulties in setting up the framework
+
+#CITE: stackoverflow.com
+#DESC: Clarificiation on syntax and uses of several methods
+
+#CITE: effbot.org/tkinterbook/place.htm
+#DESC: Clarified the canvas.place() method
+
+#CITE: effbot.org/pyfaq/how-do-i-generate-random-numbers-in-python
+#DESC: Clarification on how to create random numbers
+    

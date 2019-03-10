@@ -1,0 +1,165 @@
+/******************************************************************************
+ *
+ * Name:	Jack Scacco
+ *
+ * Date:	11-5-17
+ *
+ * Assignment: Project 6B	
+ *
+ * Purpose: To create a Frequent Writer program
+ *
+ *File: writer.cc
+ *
+ *****************************************************************************/
+#include <iostream>
+#include <fstream>
+#include <cassert>
+// CITE: http://www.cplusplus.com/reference/cstdlib/atoi/
+// DESC: Information pertaining to the atoi function
+#include <stdlib.h>
+#include <cs112.h>
+
+using namespace std;
+
+#include "List.h"
+
+typedef List::List List;
+
+// readCorpus - returns the list of characters that compose the corpus.
+// PRE:  None,
+// POST: Each character from the passed test file is placed into a list
+// in order. The list is returned.
+void readCorpus(const char* text, List& corpus) {
+  List temp;
+  corpus = temp;
+  char c;
+
+  // CITE: C++ Plus Data Structures, 6th Edition
+  // DESC: How to use fstream to input
+  ifstream fin;
+  fin.open(text);
+ 
+  corpus.begin();
+
+  while(fin >> noskipws >> c){
+    corpus.insert(c);
+  }
+}
+
+// initializePrefix - creates the first prefix.
+// PRE: None.
+// POST: The first [prefixLength] characters of the corpus are returned.
+string initializePrefix(List corpus, const int length) {
+  string prefix = "";
+
+  for(int i = 0; i < length; i++) {
+    prefix += corpus.get(i);
+  }
+
+  return prefix;
+}
+
+// getSuffixes - creates a list of new suffixes.
+// PRE: None.
+// POST: A list full of characters that follow the passed prefix is returned.
+void getSuffixes(const List corpus, List& suffixes, const string prefix) {
+  // Reset the suffixes list.
+  List temp;
+  suffixes = temp;
+  suffixes.begin();
+
+  // For each character in the corpus:
+  for(size_t cindex = 0; cindex < corpus.length() -  prefix.length(); 
+      cindex++) {
+    // Create a match boolean that becomes false when the 
+    // prefix is not followed by the corpus.
+    bool match = true;
+
+    // Starting at the cindex, for the length of prefix:
+    for(size_t pindex = 0; pindex < prefix.length(); pindex++) {
+      // If the current char doesn't match the respective char from prefix:
+      if (!(corpus.get(cindex + pindex) == prefix[pindex]))
+        // Set match to false.
+        match = false;
+    }
+
+    // If match wasn't set to false, we found a suffix! Add it to the list.
+    if (match == true)
+      suffixes.insert(corpus.get(cindex + prefix.length()));
+  }
+}
+
+// chooseSuffix - returns a random suffix.
+// PRE: The list is not empty.
+// POST: A random character from the passed list is returned.
+char chooseSuffix(const List suffixes) {
+  assert(suffixes.length() > 0);
+
+  // Generate a random index.
+  size_t index = cs112::random(suffixes.length());
+
+  return suffixes.get(index);
+ }
+
+// buildPrefix - builds a new prefix based on a passed prefix and suffix.
+// PRE: None.
+// POST: The first letter of the old prefix is removed 
+// and the suffix added to the end.
+string buildPrefix(const string prefix, const char suffix) {
+  return prefix.substr(1) + suffix;
+}
+
+// generate - outputs a string based off of the passed corpus.
+// PRE: the corpus is not less than the prefix length.
+// POST: Randomly generated text is output
+void generate(const List corpus, const int prefixLength, 
+              const int textLength) {
+  // Set the initial prefix and output it.
+  string prefix = initializePrefix(corpus, prefixLength);
+  cout << prefix;
+
+  // Create a character counter that keeps track of how many characters
+  // have been output.
+  int characterCount = prefixLength;
+
+  // Create a suffixes list to be used.
+  List suffixes;
+
+  // Create a suffix char to be used.
+  char suffix;
+
+  while (characterCount  < textLength) {
+    // Get all of the suffixes and put them into suffixes.
+    getSuffixes(corpus, suffixes, prefix);
+
+    // If there are no suffixes, end the generation process.
+    if(suffixes.length() == 0) 
+      return;
+  
+    // Choose a suffix and store it in suffix.
+    suffix = chooseSuffix(suffixes);
+  
+    // Output the suffix and adjust the counter.
+    cout << suffix;
+    characterCount ++;
+
+    // Build a new prefix using the chosen suffix.
+    prefix = buildPrefix(prefix, suffix);
+  }
+
+  cout << endl;
+  return;
+}
+
+int main(int argc, char* argv[]){
+  size_t PrefixLength  = atoi(argv[1]);
+  size_t TextLength =atoi(argv[2]);
+  List Corpus;
+  readCorpus(argv[3], Corpus);
+  //If the corpus is at least as long as the prefix length:
+  //(Prevents bounds errors).
+  if(Corpus.length() >= PrefixLength) 
+    generate(Corpus, PrefixLength, TextLength);
+  
+  return 0;
+}

@@ -1,0 +1,8 @@
+compress: compress.o PriorityQueue.o 
+	c++ -o compress compress.cc PriorityQueue.cc
+
+compress.o: compress.cc PriorityQueue.h
+	c++ -c compress.cc
+
+PriorityQueue.o: PriorityQueue.cc PriorityQueue.h
+	c++ -c PriorityQueue.cc

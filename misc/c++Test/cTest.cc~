@@ -1,0 +1,17 @@
+/******************************************************************************
+ *
+ * Name:	Jack Scacco
+ *
+ * Date:	
+ *
+ * Assignment:	
+ *
+ * Purpose:	To mess around with c++
+ *
+ *****************************************************************************/
+#include <iostream>
+using namespace std;
+
+int main(){
+  cout <<  "Hi! I'm C++!" << endl;
+}

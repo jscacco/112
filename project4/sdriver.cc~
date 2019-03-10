@@ -1,0 +1,41 @@
+/******************************************************************************
+ *
+ * Name:	Jack Scacco
+ *
+ * Date: 10-9-17
+ *
+ * Assignment: Project 4	
+ *
+ * Purpose: Function as a driver method where code can be executed	
+ *
+ *****************************************************************************/
+#include <iostream>
+
+#include "Set.h"
+
+using namespace std;
+
+int main(){
+  cout << "The driver has been run." << endl;
+
+  Set a(6);
+  Set b(6);
+  
+  
+  a.insert(3);
+  a.insert(8);
+  a.insert(7);
+  a.insert(22);
+ 
+  a.display(cout);
+   
+  /*
+  b.insert(2);
+  b.insert(3);
+  b.insert(1);
+  */
+
+  a.display(cout);
+
+  return 0;
+}
